@@ -1,4 +1,4 @@
-package lib
+package pilot
 
 import (
 	"net/http"
@@ -10,10 +10,12 @@ type Router struct {
 
 }
 
-func GetRouter() *Router {
-	router := &Router{}
+var (
+	PRouter *Router
+)
 
-	return router
+func init() {
+	PRouter = &Router{}
 }
 
 // 初始化多路复用器
@@ -28,7 +30,11 @@ func (this *Router) HandleStatic(staticPath string, staticPrefix string) {
 // 处理get路由
 func (this *Router) Get(pattern string, controller ControllerInterface, actionName string) {
 	handler := func (w http.ResponseWriter, r *http.Request) {
-		controller.Init("home", strings.ToLower(actionName))
+		controllerName := reflect.ValueOf(controller).Type().String()
+		controllerName = strings.TrimPrefix(controllerName, "*controllers.")
+		controllerName = strings.TrimSuffix(controllerName, "Controller")
+
+		controller.Init(strings.ToLower(controllerName), strings.ToLower(actionName))
 
 		args := []reflect.Value{reflect.ValueOf(w), reflect.ValueOf(r)}
 		reflect.ValueOf(controller).MethodByName(actionName).Call(args)

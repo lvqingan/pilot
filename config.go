@@ -1,4 +1,4 @@
-package lib
+package pilot
 
 import (
 	"encoding/json"
@@ -11,11 +11,12 @@ import (
 type Config struct {
 
 }
+var (
+	PConfig *Config
+)
 
-func GetConfig() *Config {
-	config := &Config{}
-
-	return config
+func init() {
+	PConfig = &Config{}
 }
 
 // 当前包内的全局变量，用来保存配置信息

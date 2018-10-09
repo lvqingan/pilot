@@ -1,4 +1,4 @@
-package lib
+package pilot
 
 import (
 	"html/template"
@@ -17,7 +17,7 @@ type Controller struct {
 
 func (this *Controller) View(writer http.ResponseWriter, data interface{}) {
 	// 1. 解析模板
-	tplPath := GetConfig().GetString("app.template_path") + "/" + this.ControllerName + "/" + this.ActionName + ".html"
+	tplPath := PConfig.GetString("app.template_path") + "/" + this.ControllerName + "/" + this.ActionName + ".html"
 	tpl := template.Must(template.ParseFiles(tplPath))
 
 	// 2. 渲染模板

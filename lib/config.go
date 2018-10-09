@@ -1,4 +1,4 @@
-package config
+package lib
 
 import (
 	"encoding/json"
@@ -8,11 +8,21 @@ import (
 	"strings"
 )
 
+type Config struct {
+
+}
+
+func GetConfig() *Config {
+	config := &Config{}
+
+	return config
+}
+
 // 当前包内的全局变量，用来保存配置信息
 var config = make(map[string]map[string]interface{})
 
 // 读取指定目录下的 json 配置文件，需要先执行 Load，才可以执行 Get
-func Load(configPath string) error {
+func (this *Config) Load(configPath string) error {
 	configFilesInfo, err := ioutil.ReadDir(configPath)
 
 	if err == nil {
@@ -38,7 +48,7 @@ func Load(configPath string) error {
 // 按指定的 key 获取配置内容，. 号分隔
 // 譬如 app.json 中包含 "key1": "val" 则按 app.key1 来取值；包含 "key1": {"key2": "val"}，则按 app.key1.key2 取值
 // 没找到返回 nil
-func Get(key string) interface{} {
+func (this *Config) Get(key string) interface{} {
 	if len(config) == 0 {
 		panic("config.Load() not executed")
 	}
@@ -68,8 +78,8 @@ func Get(key string) interface{} {
 
 // 指定返回类型为 string 的 Get 方法
 // 没找到返回 ""
-func GetString(key string) string {
-	value := Get(key)
+func (this *Config) GetString(key string) string {
+	value := this.Get(key)
 
 	if value == nil {
 		return ""

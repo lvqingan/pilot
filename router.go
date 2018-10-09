@@ -1,6 +1,7 @@
 package pilot
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"reflect"
 	"strings"
@@ -19,17 +20,17 @@ func init() {
 }
 
 // 初始化多路复用器
-var mux = http.NewServeMux()
+var router = httprouter.New()
 
 // 处理静态文件
 func (this *Router) HandleStatic(staticPath string, staticPrefix string) {
 	staticHandler := http.FileServer(http.Dir(staticPath))
-	mux.Handle(staticPrefix, http.StripPrefix(staticPrefix, staticHandler))
+	http.Handle(staticPrefix, http.StripPrefix(staticPrefix, staticHandler))
 }
 
 // 处理get路由
 func (this *Router) Get(pattern string, controller ControllerInterface, actionName string) {
-	handler := func (w http.ResponseWriter, r *http.Request) {
+	handler := func (w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		controllerName := reflect.ValueOf(controller).Type().String()
 		controllerName = strings.TrimPrefix(controllerName, "*controllers.")
 		controllerName = strings.TrimSuffix(controllerName, "Controller")
@@ -40,10 +41,10 @@ func (this *Router) Get(pattern string, controller ControllerInterface, actionNa
 		reflect.ValueOf(controller).MethodByName(actionName).Call(args)
 	}
 
-	mux.HandleFunc(pattern, handler)
+	router.GET(pattern, handler)
 }
 
 // 获取多路复用器
-func (this *Router) GetMux() *http.ServeMux {
-	return mux
+func (this *Router) GetRouter() *httprouter.Router {
+	return router
 }
